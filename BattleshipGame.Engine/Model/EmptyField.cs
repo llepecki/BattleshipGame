@@ -1,5 +1,4 @@
-﻿using System;
-namespace Com.Lepecki.BattleshipGame.Engine.Model
+﻿namespace Com.Lepecki.BattleshipGame.Engine.Model
 {
     public class EmptyField : Field
     {

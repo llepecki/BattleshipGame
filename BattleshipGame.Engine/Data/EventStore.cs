@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Text.Json;
 
 namespace Com.Lepecki.BattleshipGame.Engine.Data
 {
@@ -25,12 +23,6 @@ namespace Com.Lepecki.BattleshipGame.Engine.Data
             }
 
             _gameEvents[gameEvent.GameId].Add(gameEvent);
-        }
-
-        public void Save(string path)
-        {
-            string gameEventsString = JsonSerializer.Serialize(_gameEvents);
-            File.WriteAllText(path, gameEventsString);
         }
     }
 }

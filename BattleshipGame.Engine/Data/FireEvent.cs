@@ -11,10 +11,5 @@ namespace Com.Lepecki.BattleshipGame.Engine.Data
         }
 
         public Coordinate Target { get; }
-
-        public override string ToString()
-        {
-            return $"{nameof(FireEvent)} {GameId} {Target}";
-        }
     }
 }

@@ -25,7 +25,7 @@ namespace Com.Lepecki.BattleshipGame.Engine.Tests.Model
         }
 
         [Fact]
-        public void FiredAtNotSunkedOwnerView()
+        public void FiredAtNotSunkenOwnerView()
         {
             Ship ship = new Battleship();
             Field field = new ShipField(ship);
@@ -36,7 +36,7 @@ namespace Com.Lepecki.BattleshipGame.Engine.Tests.Model
         }
 
         [Fact]
-        public void FiredAtNotSunkedOpponentView()
+        public void FiredAtNotSunkenOpponentView()
         {
             Ship ship = new Battleship();
             Field field = new ShipField(ship);
@@ -47,7 +47,7 @@ namespace Com.Lepecki.BattleshipGame.Engine.Tests.Model
         }
 
         [Fact]
-        public void FiredAtSunkedOwnerView()
+        public void FiredAtSunkenOwnerView()
         {
             Ship ship = new Battleship();
 
@@ -64,7 +64,7 @@ namespace Com.Lepecki.BattleshipGame.Engine.Tests.Model
         }
 
         [Fact]
-        public void FiredAtSunkedOpponentView()
+        public void FiredAtSunkenOpponentView()
         {
             Ship ship = new Battleship();
 

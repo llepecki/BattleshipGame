@@ -17,11 +17,6 @@ namespace Com.Lepecki.BattleshipGame.Engine.Data
         public Coordinate Stern { get; }
 
         public Orientation Orientation { get; }
-
-        public override string ToString()
-        {
-            return $"{nameof(PlaceShipEvent)} {GameId} {Length} {Stern} {Orientation}";
-        }
     }
 }
 

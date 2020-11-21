@@ -1,12 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <ItemGroup>
-    <ProjectReference Include="..\BattleshipGame.ConsoleApp.Tests\BattleshipGame.ConsoleApp.Tests.csproj" />
-    <ProjectReference Include="..\BattleshipGame.Engine\BattleshipGame.Engine.csproj" />
-  </ItemGroup>
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
-    <AssemblyName>Com.Lepecki.BattleshipGame.ConsoleApp</AssemblyName>
-    <RootNamespace>Com.Lepecki.BattleshipGame.ConsoleApp</RootNamespace>
-  </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\BattleshipGame.Engine\BattleshipGame.Engine.csproj" />
+    </ItemGroup>
+        <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net5.0</TargetFramework>
+        <AssemblyName>Com.Lepecki.BattleshipGame.ConsoleApp</AssemblyName>
+        <RootNamespace>Com.Lepecki.BattleshipGame.ConsoleApp</RootNamespace>
+    </PropertyGroup>
 </Project>

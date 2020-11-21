@@ -25,7 +25,7 @@ namespace Com.Lepecki.BattleshipGame.Engine.Tests.Model
         }
 
         [Fact]
-        public void FiredAtNotSunkedOwnerView()
+        public void FiredAtNotSunkenOwnerView()
         {
             Ship ship = new Destroyer();
             Field field = new VicinityField(ship);
@@ -36,7 +36,7 @@ namespace Com.Lepecki.BattleshipGame.Engine.Tests.Model
         }
 
         [Fact]
-        public void FiredAtNotSunkedOpponentView()
+        public void FiredAtNotSunkenOpponentView()
         {
             Ship ship = new Destroyer();
             Field field = new VicinityField(ship);
@@ -47,11 +47,11 @@ namespace Com.Lepecki.BattleshipGame.Engine.Tests.Model
         }
 
         [Fact]
-        public void FiredAtSunkedOwnerView()
+        public void FiredAtSunkenOwnerView()
         {
             Ship ship = new Destroyer();
 
-            while (!ship.Sunked)
+            while (!ship.Sunken)
             {
                 ship.Hit();
             }
@@ -62,11 +62,11 @@ namespace Com.Lepecki.BattleshipGame.Engine.Tests.Model
         }
 
         [Fact]
-        public void FiredAtSunkedOpponentView()
+        public void FiredAtSunkenOpponentView()
         {
             Ship ship = new Destroyer();
 
-            while (!ship.Sunked)
+            while (!ship.Sunken)
             {
                 ship.Hit();
             }
@@ -88,11 +88,11 @@ namespace Com.Lepecki.BattleshipGame.Engine.Tests.Model
         }
 
         [Fact]
-        public void FiredAtSunkedShip()
+        public void FiredAtSunkenShip()
         {
             Ship ship = new Destroyer();
 
-            while (!ship.Sunked)
+            while (!ship.Sunken)
             {
                 ship.Hit();
             }

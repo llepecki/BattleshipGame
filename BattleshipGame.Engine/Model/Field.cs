@@ -14,7 +14,7 @@ namespace Com.Lepecki.BattleshipGame.Engine.Model
         {
             if (WasFiredAt)
             {
-                throw new RuleViolationException("Can't fire at the same field twice");
+                throw new RuleViolationException("Forbidden to fire at the same field twice");
             }
 
             WasFiredAt = true;

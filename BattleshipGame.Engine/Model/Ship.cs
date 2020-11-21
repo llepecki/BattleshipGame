@@ -15,13 +15,13 @@ namespace Com.Lepecki.BattleshipGame.Engine.Model
 
         public int Hits { get; private set; }
 
-        public bool Sunked => Hits == Length;
+        public bool Sunken => Hits == Length;
 
         public void Hit()
         {
-            if (Sunked)
+            if (Sunken)
             {
-                throw new RuleViolationException("Can't hit a sunked ship");
+                throw new RuleViolationException("Forbidden to hit a sunken ship");
             }
 
             Hits++;

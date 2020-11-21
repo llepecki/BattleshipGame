@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -21,11 +20,13 @@ namespace Com.Lepecki.BattleshipGame.ConsoleApp
 
         public void Play()
         {
-            Console.WriteLine("# [q]uit game, [v]iew grid or fire, by entering a coordinate, e.g. a4");
+            Console.WriteLine("# [q]uit game or fire, by entering a coordinate, e.g. a4");
+            Console.Write(GetPrintableView(_game.GetOpponentView()));
 
-            while (_game.Status != GameStatus.Finished)
+            while (!_game.Finished)
             {
                 Console.Write("> ");
+
                 string input = Console.ReadLine();
 
                 if (input.ToUpperInvariant() == "Q")
@@ -34,21 +35,17 @@ namespace Com.Lepecki.BattleshipGame.ConsoleApp
                     return;
                 }
 
-                if (input.ToUpperInvariant() == "V")
-                {
-                    Occupant[,] view = _game.GetOpponentView();
-                    Print(view);
-                    continue;
-                }
-
                 if (TryGetCoordinate(input, out Coordinate coordinate))
                 {
-                    Console.WriteLine($"# Parsed {coordinate}");
                     GameEvent fireEvent = new FireEvent(_game.Id, coordinate);
 
                     if (!_game.TryPut(fireEvent, out string message))
                     {
                         Console.WriteLine($"# {message}");
+                    }
+                    else
+                    {
+                        Console.Write(GetPrintableView(_game.GetOpponentView()));
                     }
                 }
                 else
@@ -58,13 +55,13 @@ namespace Com.Lepecki.BattleshipGame.ConsoleApp
             }
         }
 
-        private bool TryGetCoordinate(string input, out Coordinate coordinate)
+        private static bool TryGetCoordinate(string input, out Coordinate coordinate)
         {
             string upperInput = input.ToUpperInvariant();
 
             if (inputPattern.IsMatch(upperInput))
             {
-                coordinate = new Coordinate(upperInput[0] - 'A' + 1, int.Parse(upperInput.Substring(1, upperInput.Length - 1)));
+                coordinate = new Coordinate(upperInput[0] - 'A' + 1, int.Parse(upperInput[1..]));
                 return true;
             }
 
@@ -72,15 +69,16 @@ namespace Com.Lepecki.BattleshipGame.ConsoleApp
             return false;
         }
 
-        private static void Print(Occupant[,] view)
+        private static string GetPrintableView(Occupant[,] view)
         {
-            string head = string.Concat(Enumerable.Range(0, view.GetLength(0) + 1).Select(row => row == 0 ? " " : $"{row,3}"));
-            Console.WriteLine(head);
+            StringBuilder builder = new StringBuilder(Environment.NewLine);
+
+            string head = string.Concat(Enumerable.Range(0, view.GetLength(0) + 1).Select(row => row == 0 ? " " : $"{row, 3}"));
+            builder.AppendLine(head);
 
             for (int i = 0; i < view.GetLength(0); i++)
             {
-                StringBuilder builder = new StringBuilder(view.GetLength(1));
-                builder.Append(((char)('A' + i)).ToString());
+                builder.Append((char)('A' + i));
 
                 for (int j = 0; j < view.GetLength(1); j++)
                 {
@@ -89,27 +87,27 @@ namespace Com.Lepecki.BattleshipGame.ConsoleApp
                     switch (view[i, j])
                     {
                         case Occupant.Hidden:
-                            builder.Append(".");
+                            builder.Append('.');
                             break;
 
                         case Occupant.Missed:
-                            builder.Append("x");
+                            builder.Append('x');
                             break;
 
                         case Occupant.Hit:
-                            builder.Append("!");
+                            builder.Append('!');
                             break;
 
                         case Occupant.Empty:
-                            builder.Append("o");
+                            builder.Append('v');
                             break;
 
                         case Occupant.Battleship:
-                            builder.Append("B");
+                            builder.Append('B');
                             break;
 
                         case Occupant.Destroyer:
-                            builder.Append("D");
+                            builder.Append('D');
                             break;
 
                         default:
@@ -117,8 +115,11 @@ namespace Com.Lepecki.BattleshipGame.ConsoleApp
                     }
                 }
 
-                Console.WriteLine(builder.ToString());
+                builder.AppendLine(string.Empty);
             }
+
+            builder.AppendLine(string.Empty);
+            return builder.ToString();
         }
     }
 }

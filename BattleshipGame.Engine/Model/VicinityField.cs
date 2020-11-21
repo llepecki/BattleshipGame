@@ -18,7 +18,7 @@ namespace Com.Lepecki.BattleshipGame.Engine.Model
 
         public override Occupant GetOpponentView()
         {
-            if (_ship.Sunked)
+            if (_ship.Sunken)
             {
                 return Occupant.Empty;
             }
@@ -33,9 +33,9 @@ namespace Com.Lepecki.BattleshipGame.Engine.Model
 
         public override void Fire()
         {
-            if (_ship.Sunked)
+            if (_ship.Sunken)
             {
-                throw new RuleViolationException("Can't fire at a field next to a sunked ship");
+                throw new RuleViolationException("Forbidden to fire at a field next to a sunken ship");
             }
 
             base.Fire();

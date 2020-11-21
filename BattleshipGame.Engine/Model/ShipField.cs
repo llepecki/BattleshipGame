@@ -16,7 +16,7 @@
 
         public override Occupant GetOpponentView()
         {
-            if (_ship.Sunked)
+            if (_ship.Sunken)
             {
                 return _ship.Class;
             }

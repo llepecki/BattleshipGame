@@ -8,10 +8,10 @@ namespace Com.Lepecki.BattleshipGame.Engine.Model
     public class Game : IObservable<GameEvent>
     {
         private readonly List<IObserver<GameEvent>> _observers = new List<IObserver<GameEvent>>();
+        private readonly Occupant[,] _emptyView;
 
         private GridBuilder? _gridBuilder;
         private Grid? _grid = null;
-        private Occupant[,] _emptyView;
 
         public Game(ICoordinateCalculator coordinateCalculator, GridBuilderOptions gridBuilderOptions)
         {
@@ -21,7 +21,7 @@ namespace Com.Lepecki.BattleshipGame.Engine.Model
 
         public Guid Id { get; } = Guid.NewGuid();
 
-        public GameStatus Status { get; private set; } = GameStatus.NotStarted;
+        public bool Finished { get; private set; } = false;
 
         public bool TryPut(GameEvent gameEvent, out string message)
         {
@@ -31,7 +31,7 @@ namespace Com.Lepecki.BattleshipGame.Engine.Model
                 return false;
             }
 
-            if (Status == GameStatus.Finished)
+            if (Finished)
             {
                 message = $"The game has already ended";
                 return false;
@@ -97,36 +97,31 @@ namespace Com.Lepecki.BattleshipGame.Engine.Model
                 {
                     case Occupant.Battleship:
                         _gridBuilder?.PlaceBattleship(stern, orientation);
-                        PostPlacement();
-                        message = string.Empty;
-                        return true;
+                        break;
 
                     case Occupant.Destroyer:
                         _gridBuilder?.PlaceDestroyer(stern, orientation);
-                        PostPlacement();
-                        message = string.Empty;
-                        return true;
+                        break;
 
                     default:
                         message = "Unknown ship class";
                         return false;
                 }
 
+                if (_gridBuilder!.CanBuild)
+                {
+                    _grid = _gridBuilder.Build();
+                    _gridBuilder = null;
+                }
+
+                message = string.Empty;
+                return true;
+
             }
             catch (Exception exception)
             {
                 message = exception.Message;
                 return false;
-            }
-
-            void PostPlacement()
-            {
-                if (_gridBuilder!.CanBuild)
-                {
-                    _grid = _gridBuilder.Build();
-                    _gridBuilder = null;
-                    Status = GameStatus.InProgress;
-                }
             }
         }
 
@@ -144,7 +139,7 @@ namespace Com.Lepecki.BattleshipGame.Engine.Model
 
                 if (_grid?.CurrentHits == _grid?.MaxHits)
                 {
-                    Status = GameStatus.Finished;
+                    Finished = true;
                 }
 
                 message = string.Empty;

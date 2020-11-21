@@ -32,13 +32,12 @@ namespace Com.Lepecki.BattleshipGame.Engine.Model
 
         public Occupant[,] GetOpponentView()
         {
-            List<List<Occupant>> result = new List<List<Occupant>>();
-
-            var groupping = _fields.GroupBy(by => by.Key.Row, selector => selector.Value.GetOpponentView());
+            List<Occupant[]> result = new List<Occupant[]>();
+            IEnumerable<IGrouping<int, Occupant>> groupping = _fields.GroupBy(by => by.Key.Row, selector => selector.Value.GetOpponentView());
             
-            foreach (var group in groupping)
+            foreach (IGrouping<int, Occupant> group in groupping)
             {
-                result.Add(new List<Occupant>(group));
+                result.Add(group.ToArray());
             }
 
             Occupant[,] view = new Occupant[result.Count, result.Count];

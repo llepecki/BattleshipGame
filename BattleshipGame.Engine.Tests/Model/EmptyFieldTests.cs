@@ -24,7 +24,7 @@ namespace Com.Lepecki.BattleshipGame.Engine.Tests.Model
         public void FiredAtOwnerView()
         {
             Field field = new EmptyField();
-            field.Fire();
+            field.Hit();
             Assert.Equal(Occupant.Empty, field.GetOwnerView());
         }
 
@@ -32,7 +32,7 @@ namespace Com.Lepecki.BattleshipGame.Engine.Tests.Model
         public void FiredAtOpponentView()
         {
             Field field = new EmptyField();
-            field.Fire();
+            field.Hit();
             Assert.Equal(Occupant.Missed, field.GetOpponentView());
         }
 
@@ -40,8 +40,8 @@ namespace Com.Lepecki.BattleshipGame.Engine.Tests.Model
         public void FiredAtTwice()
         {
             Field field = new EmptyField();
-            field.Fire();
-            Assert.Throws<RuleViolationException>(field.Fire);
+            field.Hit();
+            Assert.Throws<RuleViolationException>(field.Hit);
         }
     }
 }

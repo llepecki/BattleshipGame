@@ -10,7 +10,7 @@ namespace Com.Lepecki.BattleshipGame.Engine.Model
 
         public abstract Occupant GetOpponentView();
 
-        public virtual void Fire()
+        public virtual void Hit()
         {
             if (WasFiredAt)
             {

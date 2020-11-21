@@ -30,7 +30,7 @@ namespace Com.Lepecki.BattleshipGame.Engine.Tests.Model
             Ship ship = new Battleship();
             Field field = new ShipField(ship);
 
-            field.Fire();
+            field.Hit();
 
             Assert.Equal(Occupant.Battleship, field.GetOwnerView());
         }
@@ -41,7 +41,7 @@ namespace Com.Lepecki.BattleshipGame.Engine.Tests.Model
             Ship ship = new Battleship();
             Field field = new ShipField(ship);
 
-            field.Fire();
+            field.Hit();
 
             Assert.Equal(Occupant.Hit, field.GetOpponentView());
         }
@@ -58,7 +58,7 @@ namespace Com.Lepecki.BattleshipGame.Engine.Tests.Model
 
             Field field = new ShipField(ship);
 
-            field.Fire();
+            field.Hit();
 
             Assert.Equal(Occupant.Battleship, field.GetOwnerView());
         }
@@ -75,7 +75,7 @@ namespace Com.Lepecki.BattleshipGame.Engine.Tests.Model
 
             Field field = new ShipField(ship);
 
-            field.Fire();
+            field.Hit();
 
             Assert.Equal(Occupant.Battleship, field.GetOpponentView());
         }
@@ -85,8 +85,8 @@ namespace Com.Lepecki.BattleshipGame.Engine.Tests.Model
         {
             Ship ship = new Battleship();
             Field field = new ShipField(ship);
-            field.Fire();
-            Assert.Throws<RuleViolationException>(field.Fire);
+            field.Hit();
+            Assert.Throws<RuleViolationException>(field.Hit);
         }
     }
 }

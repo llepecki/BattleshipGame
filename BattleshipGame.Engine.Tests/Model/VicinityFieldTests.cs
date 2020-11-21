@@ -30,7 +30,7 @@ namespace Com.Lepecki.BattleshipGame.Engine.Tests.Model
             Ship ship = new Destroyer();
             Field field = new VicinityField(ship);
 
-            field.Fire();
+            field.Hit();
 
             Assert.Equal(Occupant.Empty, field.GetOwnerView());
         }
@@ -41,7 +41,7 @@ namespace Com.Lepecki.BattleshipGame.Engine.Tests.Model
             Ship ship = new Destroyer();
             Field field = new VicinityField(ship);
 
-            field.Fire();
+            field.Hit();
 
             Assert.Equal(Occupant.Missed, field.GetOpponentView());
         }
@@ -82,9 +82,9 @@ namespace Com.Lepecki.BattleshipGame.Engine.Tests.Model
             Ship ship = new Destroyer();
             Field field = new VicinityField(ship);
 
-            field.Fire();
+            field.Hit();
 
-            Assert.Throws<RuleViolationException>(field.Fire);
+            Assert.Throws<RuleViolationException>(field.Hit);
         }
 
         [Fact]
@@ -99,7 +99,7 @@ namespace Com.Lepecki.BattleshipGame.Engine.Tests.Model
 
             Field field = new VicinityField(ship);
 
-            Assert.Throws<RuleViolationException>(field.Fire);
+            Assert.Throws<RuleViolationException>(field.Hit);
         }
     }
 }

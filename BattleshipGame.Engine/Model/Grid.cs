@@ -23,7 +23,7 @@ namespace Com.Lepecki.BattleshipGame.Engine.Model
                 throw new ArgumentOutOfRangeException(nameof(coordinate));
             }
 
-            _fields[coordinate].Fire();
+            _fields[coordinate].Hit();
         }
 
         public int MaxHits { get; }

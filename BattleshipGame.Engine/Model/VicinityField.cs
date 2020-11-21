@@ -31,14 +31,14 @@ namespace Com.Lepecki.BattleshipGame.Engine.Model
             return Occupant.Hidden;
         }
 
-        public override void Fire()
+        public override void Hit()
         {
             if (_ship.Sunken)
             {
                 throw new RuleViolationException("Forbidden to fire at a field next to a sunken ship");
             }
 
-            base.Fire();
+            base.Hit();
         }
     }
 }

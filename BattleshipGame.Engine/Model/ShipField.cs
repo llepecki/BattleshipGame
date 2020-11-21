@@ -29,9 +29,9 @@
             return Occupant.Hidden;
         }
 
-        public override void Fire()
+        public override void Hit()
         {
-            base.Fire();
+            base.Hit();
             _ship.Hit();
         }
     }

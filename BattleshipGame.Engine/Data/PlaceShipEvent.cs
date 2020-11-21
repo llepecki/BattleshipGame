@@ -1,12 +1,27 @@
-﻿using Com.Lepecki.BattleshipGame.Engine.Model;
+﻿using System;
+using Com.Lepecki.BattleshipGame.Engine.Model;
 
 namespace Com.Lepecki.BattleshipGame.Engine.Data
 {
     public abstract record PlaceShipEvent : GameEvent
     {
-        public Coordinate Stern { get; init; }
+        protected PlaceShipEvent(Guid gameId, int length, Coordinate stern, Orientation orientation) : base(gameId)
+        {
+            Length = length;
+            Stern = stern;
+            Orientation = orientation;
+        }
 
-        public Orientation Orientation { get; init; }
+        public int Length { get; }
+
+        public Coordinate Stern { get; }
+
+        public Orientation Orientation { get; }
+
+        public override string ToString()
+        {
+            return $"{nameof(PlaceShipEvent)} {GameId} {Length} {Stern} {Orientation}";
+        }
     }
 }
 

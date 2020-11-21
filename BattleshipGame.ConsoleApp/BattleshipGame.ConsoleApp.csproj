@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <ProjectReference Include="..\BattleshipGame.ConsoleApp.Tests\BattleshipGame.ConsoleApp.Tests.csproj" />
+    <ProjectReference Include="..\BattleshipGame.Engine\BattleshipGame.Engine.csproj" />
   </ItemGroup>
   <PropertyGroup>
     <OutputType>Exe</OutputType>

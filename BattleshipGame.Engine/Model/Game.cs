@@ -8,21 +8,20 @@ namespace Com.Lepecki.BattleshipGame.Engine.Model
     public class Game : IObservable<GameEvent>
     {
         private readonly List<IObserver<GameEvent>> _observers = new List<IObserver<GameEvent>>();
-        private readonly Guid _firstPlayerId;
-        private readonly Guid _secondPlayerId;
-        private readonly GridContainer _container;
-\
-        private Guid? _expectedPlayerId = null;
-        private Guid? _winnerPlayerId = null;
 
-        public Game(Guid firstPlayerId, Guid secondPlayerId)
+        private GridBuilder? _gridBuilder;
+        private Grid? _grid = null;
+        private Occupant[,] _emptyView;
+
+        public Game(ICoordinateCalculator coordinateCalculator, GridBuilderOptions gridBuilderOptions)
         {
-            _firstPlayerId = firstPlayerId;
-            _secondPlayerId = secondPlayerId;
-            _container = new GridContainer(firstPlayerId, secondPlayerId);
+            _gridBuilder = new GridBuilder(coordinateCalculator, gridBuilderOptions);
+            _emptyView = new Occupant[gridBuilderOptions.Size, gridBuilderOptions.Size];
         }
 
         public Guid Id { get; } = Guid.NewGuid();
+
+        public GameStatus Status { get; private set; } = GameStatus.NotStarted;
 
         public bool TryPut(GameEvent gameEvent, out string message)
         {
@@ -32,38 +31,46 @@ namespace Com.Lepecki.BattleshipGame.Engine.Model
                 return false;
             }
 
-            if (gameEvent.PlayerId != _firstPlayerId && gameEvent.PlayerId != _secondPlayerId)
+            if (Status == GameStatus.Finished)
             {
-                message = "You don't play here";
+                message = $"The game has already ended";
                 return false;
             }
 
-            if (_expectedPlayerId != null && gameEvent.PlayerId != _expectedPlayerId)
-            {
-                message = "It's not your turn";
-                return false;
-            }
-
-            if (_winnerPlayerId != null)
-            {
-                message = $"The game already has ended and player {_winnerPlayerId} has won";
-                return false;
-            }
+            bool success = false;
+            message = "Unknown error";
 
             switch (gameEvent)
             {
                 case PlaceBattleshipEvent pbe:
-                    return PlaceShip(pbe.PlayerId, Occupant.Battleship, pbe.Stern, pbe.Orientation, out message);
+                    success = PlaceShip(Occupant.Battleship, pbe.Stern, pbe.Orientation, out message);
+                    break;
 
                 case PlaceDestroyerEvent pde:
-                    return PlaceShip(pde.PlayerId, Occupant.Destroyer, pde.Stern, pde.Orientation, out message);
+                    success = PlaceShip(Occupant.Destroyer, pde.Stern, pde.Orientation, out message);
+                    break;
 
                 case FireEvent fe:
-                    return Fire(fe.PlayerId, fe.Target, out message);
+                    success = Fire(fe.Target, out message);
+                    break;
             }
 
-            message = "Unknown error";
-            return false;
+            if (success)
+            {
+                NotifySubscribers(gameEvent);
+            }
+
+            return success;
+        }
+
+        public Occupant[,] GetOpponentView()
+        {
+            if (_grid == null)
+            {
+                return _emptyView;
+            }
+
+            return _grid!.GetOpponentView();
         }
 
         public IDisposable Subscribe(IObserver<GameEvent> observer)
@@ -76,13 +83,11 @@ namespace Com.Lepecki.BattleshipGame.Engine.Model
             return new Unsubscriber(_observers, observer);
         }
 
-        private bool PlaceShip(Guid playerId, Occupant shipClass, Coordinate stern, Orientation orientation, out string message)
+        private bool PlaceShip(Occupant shipClass, Coordinate stern, Orientation orientation, out string message)
         {
-            GridBuilder? gridBuilder = _container.GetGridBuilder(playerId);
-
-            if (gridBuilder == null)
+            if (_gridBuilder == null)
             {
-                message = $"Player {playerId} grid has already been built";
+                message = $"The grid has already been built";
                 return false;
             }
 
@@ -91,14 +96,14 @@ namespace Com.Lepecki.BattleshipGame.Engine.Model
                 switch (shipClass)
                 {
                     case Occupant.Battleship:
-                        _container.GetGridBuilder(playerId)?.PlaceBattleship(stern, orientation);
-                        PostPlacement(playerId);
+                        _gridBuilder?.PlaceBattleship(stern, orientation);
+                        PostPlacement();
                         message = string.Empty;
                         return true;
 
                     case Occupant.Destroyer:
-                        _container.GetGridBuilder(playerId)?.PlaceDestroyer(stern, orientation);
-                        PostPlacement(playerId);
+                        _gridBuilder?.PlaceDestroyer(stern, orientation);
+                        PostPlacement();
                         message = string.Empty;
                         return true;
 
@@ -114,38 +119,32 @@ namespace Com.Lepecki.BattleshipGame.Engine.Model
                 return false;
             }
 
-            void PostPlacement(Guid playerId)
+            void PostPlacement()
             {
-                if (_container.CanBuild(playerId))
+                if (_gridBuilder!.CanBuild)
                 {
-                    _container.BuildGrid(playerId);
-
-                    if (_container.GetGrid(_firstPlayerId) != null && _container.GetGrid(_secondPlayerId) != null)
-                    {
-                        _expectedPlayerId = _firstPlayerId;
-                    }
+                    _grid = _gridBuilder.Build();
+                    _gridBuilder = null;
+                    Status = GameStatus.InProgress;
                 }
             }
         }
 
-        private bool Fire(Guid playerId, Coordinate coordinate, out string message)
+        private bool Fire(Coordinate coordinate, out string message)
         {
-            if (_expectedPlayerId == null)
+            if (_grid == null)
             {
                 message = "The game hasn't yet started";
                 return false;
             }
 
-            Guid otherPlayerId = playerId == _firstPlayerId ? _secondPlayerId : _firstPlayerId;
-            Grid? grid = _container.GetGrid(otherPlayerId);
-
             try
             {
-                grid?.Hit(coordinate);
+                _grid?.Hit(coordinate);
 
-                if (grid?.CurrentHits == grid?.MaxHits)
+                if (_grid?.CurrentHits == _grid?.MaxHits)
                 {
-                    _winnerPlayerId = playerId;
+                    Status = GameStatus.Finished;
                 }
 
                 message = string.Empty;
@@ -155,6 +154,14 @@ namespace Com.Lepecki.BattleshipGame.Engine.Model
             {
                 message = exception.Message;
                 return false;
+            }
+        }
+
+        private void NotifySubscribers(GameEvent gameEvent)
+        {
+            foreach (IObserver<GameEvent> observer in _observers)
+            {
+                observer.OnNext(gameEvent);
             }
         }
 

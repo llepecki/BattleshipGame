@@ -1,5 +1,6 @@
 ﻿using System;
 using Com.Lepecki.BattleshipGame.Engine.Gears;
+using Com.Lepecki.BattleshipGame.Engine.Model;
 using Xunit;
 
 namespace Com.Lepecki.BattleshipGame.Engine.Tests.Gears
@@ -8,33 +9,18 @@ namespace Com.Lepecki.BattleshipGame.Engine.Tests.Gears
     {
         private static readonly GridBuilderOptions Options = new GridBuilderOptions
         {
-            Cols = 10,
-            Rows = 10,
-            RequiredBattleshipCount = 2,
-            RequiredDestroyerCount = 3
+            Size = 10,
+            Battleships = 2,
+            Destroyers = 3
         };
 
-        [Theory]
-        [InlineData(0, 0)]
-        [InlineData(1, 2)]
-        [InlineData(0, 3)]
-        [InlineData(1, 3)]
-        [InlineData(2, 0)]
-        [InlineData(2, 1)]
-        [InlineData(2, 2)]
-        public void ShouldThrowWhenTryingToBuildGridThatLacksShips(int battleships, int destroyers)
+        [Fact]
+        public void ShouldThrowWhenTryingToBuildGridThatLacksShips()
         {
             GridBuilder builder = new GridBuilder(new CoordinateCalculator(), Options);
 
-            for (int i = 0; i < battleships; i++)
-            {
-                builder.PlaceBattleship();
-            }
-
-            for (int i = 0; i < destroyers; i++)
-            {
-                builder.PlaceDestroyer();
-            }
+            builder.PlaceBattleship(new Coordinate(1, 1), Orientation.South);
+            builder.PlaceDestroyer(new Coordinate(1, 3), Orientation.South);
 
             Assert.Throws<InvalidOperationException>(() => builder.Build());
         }

@@ -18,16 +18,40 @@ namespace Com.Lepecki.BattleshipGame.Engine.Model
 
         public void Hit(Coordinate coordinate)
         {
-            if (_fields.ContainsKey(coordinate))
+            if (!_fields.ContainsKey(coordinate))
             {
-                _fields[coordinate].Fire();
+                throw new ArgumentOutOfRangeException(nameof(coordinate));
             }
 
-            throw new ArgumentOutOfRangeException(nameof(coordinate));
+            _fields[coordinate].Fire();
         }
 
         public int MaxHits { get; }
 
         public int CurrentHits => _ships.Sum(ship => ship.Hits);
+
+        public Occupant[,] GetOpponentView()
+        {
+            List<List<Occupant>> result = new List<List<Occupant>>();
+
+            var groupping = _fields.GroupBy(by => by.Key.Row, selector => selector.Value.GetOpponentView());
+            
+            foreach (var group in groupping)
+            {
+                result.Add(new List<Occupant>(group));
+            }
+
+            Occupant[,] view = new Occupant[result.Count, result.Count];
+
+            for (int i = 0; i < result.Count; i++)
+            {
+                for (int j = 0; j < result.Count; j++)
+                {
+                    view[i, j] = result[i][j];
+                }
+            }
+
+            return view;
+        }
     }
 }

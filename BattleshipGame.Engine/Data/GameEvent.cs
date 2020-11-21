@@ -4,8 +4,11 @@ namespace Com.Lepecki.BattleshipGame.Engine.Data
 {
     public abstract record GameEvent
     {
-        public Guid GameId { get; init; }
+        protected GameEvent(Guid gameId)
+        {
+            GameId = gameId;
+        }
 
-        public Guid PlayerId { get; init; }
+        public Guid GameId { get; }
     }
 }

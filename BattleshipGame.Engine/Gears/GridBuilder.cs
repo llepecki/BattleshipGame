@@ -1,17 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Com.Lepecki.BattleshipGame.Engine.Exceptions;
 using Com.Lepecki.BattleshipGame.Engine.Model;
 
 namespace Com.Lepecki.BattleshipGame.Engine.Gears
 {
     public class GridBuilder
     {
-        private const int RandomAttemptsLimit = 10000;
-
-        private static readonly Random random = new Random();
-
         private readonly ICoordinateCalculator _coordinateCalculator;
         private readonly GridBuilderOptions _options;
         private readonly Dictionary<Coordinate, Field> _fields;
@@ -25,11 +20,11 @@ namespace Com.Lepecki.BattleshipGame.Engine.Gears
         {
             _coordinateCalculator = coordinateCalculator;
             _options = options;
-            _fields = new Dictionary<Coordinate, Field>(_options.Cols * _options.Rows);
+            _fields = new Dictionary<Coordinate, Field>(_options.Size * _options.Size);
 
-            for (int c = 0; c < _options.Cols; c++)
+            for (int c = 1; c < _options.Size + 1; c++)
             {
-                for (int r = 0; r < _options.Rows; r++)
+                for (int r = 1; r < _options.Size + 1; r++)
                 {
                     _fields.Add(new Coordinate(r, c), new EmptyField());
                 }
@@ -38,7 +33,7 @@ namespace Com.Lepecki.BattleshipGame.Engine.Gears
 
         public void PlaceBattleship(Coordinate stern, Orientation orientation)
         {
-            if (_currentBattleshipCount == _options.RequiredBattleshipCount)
+            if (_currentBattleshipCount == _options.Battleships)
             {
                 throw new InvalidOperationException($"All {nameof(Battleship)}s are already in place");
             }
@@ -51,33 +46,9 @@ namespace Com.Lepecki.BattleshipGame.Engine.Gears
             _currentBattleshipCount++;
         }
 
-        public void PlaceBattleship()
-        {
-            if (_currentBattleshipCount == _options.RequiredBattleshipCount)
-            {
-                throw new InvalidOperationException($"All {nameof(Battleship)}s are already in place");
-            }
-
-            int attempts = 0;
-            (Coordinate stern, Orientation orientation) placement = GetRandomPlacement();
-
-            while (!TryPlaceShip(new Battleship(), placement.stern, placement.orientation) && attempts < RandomAttemptsLimit)
-            {
-                placement = GetRandomPlacement();
-                attempts++;
-            }
-
-            if (attempts == RandomAttemptsLimit)
-            {
-                throw new RandomPlacementException($"Failed to randomly place a {nameof(Battleship)}");
-            }
-
-            _currentBattleshipCount++;
-        }
-
         public void PlaceDestroyer(Coordinate stern, Orientation orientation)
         {
-            if (_currentDestroyerCount == _options.RequiredDestroyerCount)
+            if (_currentDestroyerCount == _options.Destroyers)
             {
                 throw new InvalidOperationException($"All {nameof(Destroyer)}s are already in place");
             }
@@ -90,39 +61,15 @@ namespace Com.Lepecki.BattleshipGame.Engine.Gears
             _currentDestroyerCount++;
         }
 
-        public void PlaceDestroyer()
-        {
-            if (_currentDestroyerCount == _options.RequiredDestroyerCount)
-            {
-                throw new InvalidOperationException($"All {nameof(Destroyer)}s are already in place");
-            }
-
-            int attempts = 0;
-            (Coordinate stern, Orientation orientation) placement = GetRandomPlacement();
-
-            while (!TryPlaceShip(new Destroyer(), placement.stern, placement.orientation) && attempts < RandomAttemptsLimit)
-            {
-                placement = GetRandomPlacement();
-                attempts++;
-            }
-
-            if (attempts == RandomAttemptsLimit)
-            {
-                throw new RandomPlacementException($"Failed to randomly place a {nameof(Destroyer)}");
-            }
-
-            _currentDestroyerCount++;
-        }
-
         public bool CanBuild =>
-            _currentBattleshipCount == _options.RequiredBattleshipCount &&
-            _currentDestroyerCount == _options.RequiredDestroyerCount;
+            _currentBattleshipCount == _options.Battleships &&
+            _currentDestroyerCount == _options.Destroyers;
 
         public Grid Build()
         {
             if (!CanBuild)
             {
-                throw new InvalidOperationException($"Not enough ships to build the grid: {_currentBattleshipCount}/{_options.RequiredBattleshipCount} {nameof(Battleship)}(s), {_currentDestroyerCount}/{_options.RequiredDestroyerCount} {nameof(Destroyer)}(s)");
+                throw new InvalidOperationException($"Not enough ships to build the grid: {_currentBattleshipCount}/{_options.Battleships} {nameof(Battleship)}(s), {_currentDestroyerCount}/{_options.Destroyers} {nameof(Destroyer)}(s)");
             }
 
             return new Grid(_fields, _ships);
@@ -152,6 +99,7 @@ namespace Com.Lepecki.BattleshipGame.Engine.Gears
                     _lockedCoordinates.Add(coordinate);
                 }
 
+                _ships.Add(ship);
                 return true;
             }
 
@@ -166,24 +114,6 @@ namespace Com.Lepecki.BattleshipGame.Engine.Gears
         private bool IsUnavailable(Coordinate coordinate)
         {
             return _lockedCoordinates.Contains(coordinate);
-        }
-
-        private (Coordinate coordinate, Orientation orientation) GetRandomPlacement()
-        {
-            Coordinate randomCoordinate = new Coordinate(random.Next(0, _options.Rows), random.Next(0, _options.Cols));
-
-            int randomOrientationNumber = random.Next(0, 4);
-
-            Orientation randomOrientation = randomOrientationNumber switch
-            {
-                0 => Orientation.North,
-                1 => Orientation.South,
-                2 => Orientation.West,
-                3 => Orientation.East,
-                _ => throw new ArgumentOutOfRangeException()
-            };
-
-            return (randomCoordinate, randomOrientation);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -11,6 +12,16 @@ namespace Com.Lepecki.BattleshipGame.ConsoleApp
     {
         private static readonly Regex inputPattern = new Regex("^[A-J]([1-9]|10)$");
 
+        private static readonly Dictionary<Occupant, char> legend = new Dictionary<Occupant, char>
+        {
+            { Occupant.Battleship, 'B' },
+            { Occupant.Destroyer, 'D' },
+            { Occupant.Empty, 'v' },
+            { Occupant.Hidden, '.' },
+            { Occupant.Hit, '!' },
+            { Occupant.Missed, 'x' }
+        };
+
         private readonly Game _game;
 
         public ConsolePlayer(Game game)
@@ -20,19 +31,33 @@ namespace Com.Lepecki.BattleshipGame.ConsoleApp
 
         public void Play()
         {
-            Console.WriteLine("# [q]uit game or fire, by entering a coordinate, e.g. a4");
+            Console.WriteLine("# [q]uit game, print [l]egend or fire, by entering a coordinate, e.g. a4");
             Console.Write(GetPrintableView(_game.GetOpponentView()));
 
             while (!_game.Finished)
             {
                 Console.Write("> ");
 
-                string input = Console.ReadLine();
+                string? input = Console.ReadLine();
 
-                if (input.ToUpperInvariant() == "Q")
+                if (input!.ToUpperInvariant() == "Q")
                 {
                     Console.WriteLine("# Bye, bye");
                     return;
+                }
+
+                if (input!.ToUpperInvariant() == "L")
+                {
+                    Console.WriteLine();
+
+                    foreach (KeyValuePair<Occupant, char> pair in legend)
+                    {
+                        Console.WriteLine($"{pair.Value} - {pair.Key}");
+                    }
+
+                    Console.WriteLine();
+
+                    continue;
                 }
 
                 if (TryGetCoordinate(input, out Coordinate coordinate))
@@ -53,6 +78,8 @@ namespace Com.Lepecki.BattleshipGame.ConsoleApp
                     Console.WriteLine($"# Coordinate out of range");
                 }
             }
+
+            Console.WriteLine("# Congrats, you have won!");
         }
 
         private static bool TryGetCoordinate(string input, out Coordinate coordinate)
@@ -83,42 +110,13 @@ namespace Com.Lepecki.BattleshipGame.ConsoleApp
                 for (int j = 0; j < view.GetLength(1); j++)
                 {
                     builder.Append("  ");
-
-                    switch (view[i, j])
-                    {
-                        case Occupant.Hidden:
-                            builder.Append('.');
-                            break;
-
-                        case Occupant.Missed:
-                            builder.Append('x');
-                            break;
-
-                        case Occupant.Hit:
-                            builder.Append('!');
-                            break;
-
-                        case Occupant.Empty:
-                            builder.Append('v');
-                            break;
-
-                        case Occupant.Battleship:
-                            builder.Append('B');
-                            break;
-
-                        case Occupant.Destroyer:
-                            builder.Append('D');
-                            break;
-
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
+                    builder.Append(legend[view[i, j]]);
                 }
 
-                builder.AppendLine(string.Empty);
+                builder.AppendLine();
             }
 
-            builder.AppendLine(string.Empty);
+            builder.AppendLine();
             return builder.ToString();
         }
     }

@@ -1,14 +1,21 @@
-﻿using Com.Lepecki.BattleshipGame.Engine.Exceptions;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Com.Lepecki.BattleshipGame.Engine.Exceptions;
 
 namespace Com.Lepecki.BattleshipGame.Engine.Model
 {
     public class VicinityField : Field
     {
-        private readonly Ship _ship;
+        private readonly Ship[] _ships;
 
         public VicinityField(Ship ship)
         {
-            _ship = ship;
+            _ships = new[] { ship };
+        }
+
+        public VicinityField(IEnumerable<Ship> ships)
+        {
+            _ships = ships.ToArray();
         }
 
         public override Occupant GetOwnerView()
@@ -18,7 +25,7 @@ namespace Com.Lepecki.BattleshipGame.Engine.Model
 
         public override Occupant GetOpponentView()
         {
-            if (_ship.Sunken)
+            if (_ships.Any(ship => ship.Sunken))
             {
                 return Occupant.Empty;
             }
@@ -33,12 +40,17 @@ namespace Com.Lepecki.BattleshipGame.Engine.Model
 
         public override void Hit()
         {
-            if (_ship.Sunken)
+            if (_ships.Any(ship => ship.Sunken))
             {
                 throw new RuleViolationException("Forbidden to fire at a field next to a sunken ship");
             }
 
             base.Hit();
+        }
+
+        public VicinityField Merge(VicinityField other)
+        {
+            return new VicinityField(Enumerable.Concat(_ships, other._ships));
         }
     }
 }

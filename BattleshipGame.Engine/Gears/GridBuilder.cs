@@ -95,7 +95,15 @@ namespace Com.Lepecki.BattleshipGame.Engine.Gears
 
                 foreach (Coordinate coordinate in vicinityCoordinatesWithinGrid)
                 {
-                    _fields[coordinate] = new VicinityField(ship);
+                    if (_fields[coordinate] is VicinityField vicinityField)
+                    {
+                        _fields[coordinate] = vicinityField.Merge(new VicinityField(ship));
+                    }
+                    else
+                    {
+                        _fields[coordinate] = new VicinityField(ship);
+                    }
+
                     _lockedCoordinates.Add(coordinate);
                 }
 

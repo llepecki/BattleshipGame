@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "BattleshipGame.ConsoleApp": {
+      "commandName": "Project",
+      "commandLineArgs": "-p \"C:\\Users\\llepecki\\Desktop\""
+    }
+  }
+}

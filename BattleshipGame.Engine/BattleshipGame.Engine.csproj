@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<ItemGroup>
+		<Folder Include="Gears\" />
+	</ItemGroup>
+	<PropertyGroup>
+		<TargetFramework>net5.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<AssemblyName>Com.Lepecki.BattleshipGame.Engine</AssemblyName>
+		<RootNamespace>Com.Lepecki.BattleshipGame.Engine</RootNamespace>
+	</PropertyGroup>
+    <ItemGroup>
+	    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+		    <_Parameter1>$(AssemblyName).Tests</_Parameter1>
+	    </AssemblyAttribute>
+    </ItemGroup>
+</Project>
